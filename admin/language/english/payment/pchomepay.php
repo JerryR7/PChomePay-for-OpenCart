@@ -15,13 +15,21 @@ $_['text_success'] = 'Success: You have modified PChomePay payment module!';
 $_['text_edit'] = 'Edit PChomePay Payments';
 $_['text_pchomepay'] = '<a target="_BLANK" href="https://www.pchomepay.com.tw/"><img src="view/image/payment/pchomepay.png" alt="PChomePay Website Payment" title="PChomePay Website Payment iFrame" style="border: 1px solid #EEEEEE;" /></a>';
 $_['text_all_zones'] = 'All Zones';
+$_['text_card'] = 'Credit Card';
+$_['text_atm'] = 'ATM';
+$_['text_each'] = 'e-ACH';
+$_['text_acct'] = 'PChomaPay Account';
 
 // Entry
+$_['entry_status'] = 'Status';
 $_['entry_appid'] = 'APP ID';
 $_['entry_secret'] = 'SECRET';
 $_['entry_sandbox_secret'] = 'SECRET for SandBox';
 $_['entry_test'] = 'Sandbox Mode';
 $_['entry_debug'] = 'Debug Mode';
+$_['entry_geo_zone'] = 'Geo Zone';
+$_['entry_payment_methods'] = 'Payment Methods';
+
 $_['entry_canceled_reversal_status'] = 'Canceled Reversal Status';
 $_['entry_completed_status'] = 'Completed Status';
 $_['entry_denied_status'] = 'Denied Status';
@@ -32,9 +40,6 @@ $_['entry_processed_status'] = 'Processed Status';
 $_['entry_refunded_status'] = 'Refunded Status';
 $_['entry_reversed_status'] = 'Reversed Status';
 $_['entry_voided_status'] = 'Voided Status';
-$_['entry_geo_zone'] = 'Geo Zone';
-$_['entry_status'] = 'Status';
-$_['entry_sort_order'] = 'Sort Order';
 
 // Tab
 $_['tab_general'] = 'General';

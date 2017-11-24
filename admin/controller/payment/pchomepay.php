@@ -33,12 +33,21 @@ class ControllerPaymentPChomePay extends Controller
         $data['text_all_zones'] = $this->language->get('text_all_zones');
         $data['text_yes'] = $this->language->get('text_yes');
         $data['text_no'] = $this->language->get('text_no');
+        $data['text_card'] = $this->language->get('text_card');
+        $data['text_atm'] = $this->language->get('text_atm');
+        $data['text_each'] = $this->language->get('text_each');
+        $data['text_acct'] = $this->language->get('text_acct');
 
+        $data['entry_status'] = $this->language->get('entry_status');
         $data['entry_appid'] = $this->language->get('entry_appid');
         $data['entry_secret'] = $this->language->get('entry_secret');
         $data['entry_sandbox_secret'] = $this->language->get('entry_sandbox_secret');
         $data['entry_test'] = $this->language->get('entry_test');
         $data['entry_debug'] = $this->language->get('entry_debug');
+        $data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
+        $data['entry_sort_order'] = $this->language->get('entry_sort_order');
+        $data['entry_payment_methods'] = $this->language->get('entry_payment_methods');
+
         $data['entry_canceled_reversal_status'] = $this->language->get('entry_canceled_reversal_status');
         $data['entry_completed_status'] = $this->language->get('entry_completed_status');
         $data['entry_denied_status'] = $this->language->get('entry_denied_status');
@@ -49,9 +58,6 @@ class ControllerPaymentPChomePay extends Controller
         $data['entry_refunded_status'] = $this->language->get('entry_refunded_status');
         $data['entry_reversed_status'] = $this->language->get('entry_reversed_status');
         $data['entry_voided_status'] = $this->language->get('entry_voided_status');
-        $data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
-        $data['entry_status'] = $this->language->get('entry_status');
-        $data['entry_sort_order'] = $this->language->get('entry_sort_order');
 
         $data['help_test'] = $this->language->get('help_test');
         $data['help_debug'] = $this->language->get('help_debug');
@@ -129,6 +135,12 @@ class ControllerPaymentPChomePay extends Controller
             $data['pchomepay_debug'] = $this->request->post['pchomepay_debug'];
         } else {
             $data['pchomepay_debug'] = $this->config->get('pchomepay_debug');
+        }
+
+        if (isset($this->request->post['pchomepay_payment_methods'])) {
+            $data['pchomepay_payment_methods'] = $this->request->post['pchomepay_payment_methods'];
+        } else {
+            $data['pchomepay_payment_methods'] = $this->config->get('pchomepay_payment_methods');
         }
 
         if (isset($this->request->post['pchomepay_canceled_reversal_status_id'])) {

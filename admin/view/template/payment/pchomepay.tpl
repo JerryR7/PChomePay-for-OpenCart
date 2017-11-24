@@ -34,6 +34,21 @@
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-general">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"
+                                       for="input-status"><?php echo $entry_status; ?></label>
+                                <div class="col-sm-10">
+                                    <select name="pchomepay_status" id="input-status" class="form-control">
+                                        <?php if ($pchomepay_status) { ?>
+                                        <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                                        <option value="0"><?php echo $text_disabled; ?></option>
+                                        <?php } else { ?>
+                                        <option value="1"><?php echo $text_enabled; ?></option>
+                                        <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="form-group required">
                                 <label class="col-sm-2 control-label"
                                        for="entry-appid"><?php echo $entry_appid; ?></label>
@@ -71,8 +86,11 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label" for="input-live-demo"><span data-toggle="tooltip"
-                                                                                                  title="<?php echo $help_test; ?>"><?php echo $entry_test; ?></span></label>
+                                <label class="col-sm-2 control-label" for="input-live-demo">
+                                    <span data-toggle="tooltip" title="<?php echo $help_test; ?>">
+                                        <?php echo $entry_test; ?>
+                                    </span>
+                                </label>
                                 <div class="col-sm-10">
                                     <select name="pchomepay_test" id="input-live-demo" class="form-control">
                                         <?php if ($pchomepay_test) { ?>
@@ -86,8 +104,11 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label" for="input-debug"><span data-toggle="tooltip"
-                                                                                              title="<?php echo $help_debug; ?>"><?php echo $entry_debug; ?></span></label>
+                                <label class="col-sm-2 control-label" for="input-debug">
+                                    <span data-toggle="tooltip" title="<?php echo $help_debug; ?>">
+                                        <?php echo $entry_debug; ?>
+                                    </span>
+                                </label>
                                 <div class="col-sm-10">
                                     <select name="pchomepay_debug" id="input-debug" class="form-control">
                                         <?php if ($pchomepay_debug) { ?>
@@ -98,6 +119,41 @@
                                         <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
                                         <?php } ?>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">
+                                    <?php echo $entry_payment_methods; ?>
+                                </label>
+                                <div class="col-sm-2">
+                                    <?php $checked = ' checked="checked"'; ?>
+                                    <input type="checkbox" name="pchomepay_payment_methods['CARD']"
+                                           value="credit"<?php if (isset($pchomepay_payment_methods['Credit'])) { echo $checked; }	?>
+                                    />
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_card; ?>
+                                    </label>
+                                    <br/>
+                                    <input type="checkbox" name="pchomepay_payment_methods['ATM']"
+                                           value="atm"<?php if (isset($pchomepay_payment_methods['ATM'])) { echo $checked; }	?>
+                                    />
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_atm; ?>
+                                    </label>
+                                    <br/>
+                                    <input type="checkbox" name="pchomepay_payment_methods['EACH']"
+                                           value="atm"<?php if (isset($pchomepay_payment_methods['EACH'])) { echo $checked; }	?>
+                                    />
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_each; ?>
+                                    </label>
+                                    <br/>
+                                    <input type="checkbox" name="pchomepay_payment_methods['ACCT']"
+                                           value="atm"<?php if (isset($pchomepay_payment_methods['ACCT'])) { echo $checked; }	?>
+                                    />
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_acct; ?>
+                                    </label>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -113,21 +169,6 @@
                                         <?php } else { ?>
                                         <option value="<?php echo $geo_zone['geo_zone_id']; ?>"><?php echo $geo_zone['name']; ?></option>
                                         <?php } ?>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-status"><?php echo $entry_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_status" id="input-status" class="form-control">
-                                        <?php if ($pchomepay_status) { ?>
-                                        <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
-                                        <option value="0"><?php echo $text_disabled; ?></option>
-                                        <?php } else { ?>
-                                        <option value="1"><?php echo $text_enabled; ?></option>
-                                        <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
                                         <?php } ?>
                                     </select>
                                 </div>
