@@ -107,40 +107,27 @@ class ControllerPaymentPChomePay extends Controller
 
         $data['cancel'] = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], true);
 
-        if (isset($this->request->post['pchomepay_appid'])) {
-            $data['pchomepay_appid'] = $this->request->post['pchomepay_appid'];
-        } else {
-            $data['pchomepay_appid'] = $this->config->get('pchomepay_appid');
-        }
+        # Get PChomePay setting
+        $pchomepay_settings = array(
+            'status',
+            'appid',
+            'secret',
+            'sandbox_secret',
+            'test',
+            'debug',
+            'payment_methods',
+            'geo_zone_id',
+            'sort_order'
+        );
 
-        if (isset($this->request->post['pchomepay_secret'])) {
-            $data['pchomepay_secret'] = $this->request->post['pchomepay_secret'];
-        } else {
-            $data['pchomepay_secret'] = $this->config->get('pchomepay_secret');
-        }
+        foreach ($pchomepay_settings as $setting_name) {
+            $pchomepay_setting_name = 'pchomepay_' . $setting_name;
 
-        if (isset($this->request->post['pchomepay_sandbox_secret'])) {
-            $data['pchomepay_sandbox_secret'] = $this->request->post['pchomepay_sandbox_secret'];
-        } else {
-            $data['pchomepay_sandbox_secret'] = $this->config->get('pchomepay_sandbox_secret');
-        }
-
-        if (isset($this->request->post['pchomepay_test'])) {
-            $data['pchomepay_test'] = $this->request->post['pchomepay_test'];
-        } else {
-            $data['pchomepay_test'] = $this->config->get('pchomepay_test');
-        }
-
-        if (isset($this->request->post['pchomepay_debug'])) {
-            $data['pchomepay_debug'] = $this->request->post['pchomepay_debug'];
-        } else {
-            $data['pchomepay_debug'] = $this->config->get('pchomepay_debug');
-        }
-
-        if (isset($this->request->post['pchomepay_payment_methods'])) {
-            $data['pchomepay_payment_methods'] = $this->request->post['pchomepay_payment_methods'];
-        } else {
-            $data['pchomepay_payment_methods'] = $this->config->get('pchomepay_payment_methods');
+            if (isset($this->request->post[$pchomepay_setting_name])) {
+                $data[$pchomepay_setting_name] = $this->request->post[$pchomepay_setting_name];
+            } else {
+                $data[$pchomepay_setting_name] = $this->config->get($pchomepay_setting_name);
+            }
         }
 
         if (isset($this->request->post['pchomepay_canceled_reversal_status_id'])) {
@@ -207,27 +194,9 @@ class ControllerPaymentPChomePay extends Controller
 
         $data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 
-        if (isset($this->request->post['pchomepay_geo_zone_id'])) {
-            $data['pchomepay_geo_zone_id'] = $this->request->post['pchomepay_geo_zone_id'];
-        } else {
-            $data['pchomepay_geo_zone_id'] = $this->config->get('pchomepay_geo_zone_id');
-        }
-
         $this->load->model('localisation/geo_zone');
 
         $data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();
-
-        if (isset($this->request->post['pchomepay_status'])) {
-            $data['pchomepay_status'] = $this->request->post['pchomepay_status'];
-        } else {
-            $data['pchomepay_status'] = $this->config->get('pchomepay_status');
-        }
-
-        if (isset($this->request->post['pchomepay_sort_order'])) {
-            $data['pchomepay_sort_order'] = $this->request->post['pchomepay_sort_order'];
-        } else {
-            $data['pchomepay_sort_order'] = $this->config->get('pchomepay_sort_order');
-        }
 
         $data['header'] = $this->load->controller('common/header');
         $data['column_left'] = $this->load->controller('common/column_left');

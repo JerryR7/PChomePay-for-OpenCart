@@ -127,30 +127,22 @@
                                 </label>
                                 <div class="col-sm-2">
                                     <?php $checked = ' checked="checked"'; ?>
-                                    <input type="checkbox" name="pchomepay_payment_methods['CARD']"
-                                           value="credit"<?php if (isset($pchomepay_payment_methods['Credit'])) { echo $checked; }	?>
-                                    />
+                                    <input type="checkbox" name="pchomepay_payment_methods[CARD]" value="card"<?php if (isset($pchomepay_payment_methods['CARD'])) { echo $checked; }?>/>
                                     <label class="control-label">
                                         &nbsp;<?php echo $text_card; ?>
                                     </label>
                                     <br/>
-                                    <input type="checkbox" name="pchomepay_payment_methods['ATM']"
-                                           value="atm"<?php if (isset($pchomepay_payment_methods['ATM'])) { echo $checked; }	?>
-                                    />
+                                    <input type="checkbox" name="pchomepay_payment_methods[ATM]" value="atm"<?php if (isset($pchomepay_payment_methods['ATM'])) { echo $checked; }?>/>
                                     <label class="control-label">
                                         &nbsp;<?php echo $text_atm; ?>
                                     </label>
                                     <br/>
-                                    <input type="checkbox" name="pchomepay_payment_methods['EACH']"
-                                           value="atm"<?php if (isset($pchomepay_payment_methods['EACH'])) { echo $checked; }	?>
-                                    />
+                                    <input type="checkbox" name="pchomepay_payment_methods[EACH]" value="each"<?php if (isset($pchomepay_payment_methods['EACH'])) { echo $checked; }?>/>
                                     <label class="control-label">
                                         &nbsp;<?php echo $text_each; ?>
                                     </label>
                                     <br/>
-                                    <input type="checkbox" name="pchomepay_payment_methods['ACCT']"
-                                           value="atm"<?php if (isset($pchomepay_payment_methods['ACCT'])) { echo $checked; }	?>
-                                    />
+                                    <input type="checkbox" name="pchomepay_payment_methods[ACCT]" value="acct"<?php if (isset($pchomepay_payment_methods['ACCT'])) { echo $checked; }?>/>
                                     <label class="control-label">
                                         &nbsp;<?php echo $text_acct; ?>
                                     </label>
