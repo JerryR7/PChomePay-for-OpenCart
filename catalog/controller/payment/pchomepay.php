@@ -37,6 +37,10 @@ class ControllerPaymentPChomePay extends Controller
             }
             $this->ocLog(json_encode($data));
         }
+
+        $data['custom'] = $this->session->data['order_id'];
+
+        return $this->load->view('payment/pchomepay', $data);
     }
 
     public function callback()
