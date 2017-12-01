@@ -68,4 +68,85 @@ class ModelPaymentPChomePay extends Model
 
         return $method_data;
     }
+
+    /**
+     * @param $url
+     * @param $params
+     * @param array $headers
+     * @param array $settings
+     * @param int $timeout
+     * @return mixed
+     */
+    public function post($url, $params, array $headers = null, array $settings = [], $timeout = 500)
+    {
+        $reqData = $this->parseReqData($params);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $reqData);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+
+        if ($headers !== null) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
+        if (!empty($settings)) {
+            foreach ($settings as $key => $value) {
+                if (defined($key)) {
+                    curl_setopt($ch, constant($key), $value);
+                }
+            }
+        }
+
+        $content = curl_exec($ch);
+
+        $err = curl_errno($ch);
+
+        if ($err) {
+            $errMessage = "curl error => (" . $err . ")" . curl_error($ch);
+            curl_close($ch);
+            throw new RuntimeException($errMessage);
+        }
+
+        curl_close($ch);
+        return $content;
+    }
+
+    /**
+     * @param $params
+     * @return string
+     */
+    private function parseReqData($params)
+    {
+        $reqData = '';
+        if (is_array($params) && !empty($params)) {
+            foreach ($params as $key => $value) {
+                $reqData .= "{$key}={$value}&";
+            }
+            $reqData = rtrim($reqData, '&');
+        } else {
+            $reqData = $params;
+        }
+
+        return $reqData;
+    }
+
+
+    /**
+     * @param $url
+     * @param $userAuth
+     * @return string
+     */
+    public function postToken($userAuth, $url)
+    {
+        return $this->post($url, null, [], ["CURLOPT_USERPWD" => $userAuth]);
+    }
+
+    public function postAPI($token, $url, $data)
+    {
+        return $this->post($url, null, ["pcpay-token: {$token}"], ["CURLOPT_POSTFIELDS" => $data]);
+    }
+
 }
