@@ -127,6 +127,6 @@ class ControllerPaymentPChomePay extends Controller
     {
         $today = date('Ymd');
         $log = new Log("PChomePay-{$today}.log");
-        $log->write(get_class() . ' : ' . $message . "\n");
+        $log->write('class ' . get_class() . ' : ' . $message . "\n");
     }
 }

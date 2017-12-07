@@ -8,7 +8,11 @@
 
 class ModelPaymentPChomePay extends Model
 {
-    public function getMethod($address, $total) {
+    const BASE_URL = "https://api.pchomepay.com.tw/v1";
+    const SB_BASE_URL = "https://sandbox-api.pchomepay.com.tw/v1";
+
+    public function getMethod($address, $total)
+    {
         $this->load->language('payment/pchomepay');
 
         $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('pchomepay_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
@@ -59,14 +63,40 @@ class ModelPaymentPChomePay extends Model
 
         if ($status) {
             $method_data = array(
-                'code'       => 'pchomepay',
-                'title'      => $this->language->get('text_title'),
-                'terms'      => '',
+                'code' => 'pchomepay',
+                'title' => $this->language->get('text_title'),
+                'terms' => '',
                 'sort_order' => $this->config->get('pchomepay_sort_order')
             );
         }
 
         return $method_data;
+    }
+
+    public function baseURL()
+    {
+        $sandBox_mode = $this->config->get('pchomepay_test');
+        $baseURL = $sandBox_mode ? ModelPaymentPChomePay::SB_BASE_URL : ModelPaymentPChomePay::BASE_URL;
+
+        return $baseURL;
+    }
+
+    public function getToken()
+    {
+        $tokenURL = $this->baseURL() . "/token";
+        $sandBox_mode = $this->config->get('pchomepay_test');
+
+        $appID = $this->config->get('pchomepay_appid');
+        $secret = $sandBox_mode ? $this->config->get('pchomepay_sandbox_secret') : $this->config->get('pchomepay_secret');
+
+        $userAuth = "{$appID}:{$secret}";
+
+        $body = $this->postToken($userAuth, $tokenURL);
+        $this->handleResult($body);
+        $this->token = new PPToken($body);
+        $this->tokenStorage->saveTokenStr($this->token->getJson());
+
+        return $this->token;
     }
 
     /**
@@ -147,6 +177,43 @@ class ModelPaymentPChomePay extends Model
     public function postAPI($token, $url, $data)
     {
         return $this->post($url, null, ["pcpay-token: {$token}"], ["CURLOPT_POSTFIELDS" => $data]);
+    }
+
+    private function handleResult($result)
+    {
+        $jsonErrMap = [
+            JSON_ERROR_NONE => 'No error has occurred',
+            JSON_ERROR_DEPTH => 'The maximum stack depth has been exceeded',
+            JSON_ERROR_STATE_MISMATCH => 'Invalid or malformed JSON',
+            JSON_ERROR_CTRL_CHAR => 'Control character error, possibly incorrectly encoded',
+            JSON_ERROR_SYNTAX => 'Syntax error',
+            JSON_ERROR_UTF8 => 'Malformed UTF-8 characters, possibly incorrectly encoded	PHP 5.3.3',
+            JSON_ERROR_RECURSION => 'One or more recursive references in the value to be encoded	PHP 5.5.0',
+            JSON_ERROR_INF_OR_NAN => 'One or more NAN or INF values in the value to be encoded	PHP 5.5.0',
+            JSON_ERROR_UNSUPPORTED_TYPE => 'A value of a type that cannot be encoded was given	PHP 5.5.0'
+        ];
+
+        $obj = json_decode($result);
+
+        $err = json_last_error();
+
+        if ($err) {
+            $errStr = "($err)" . $jsonErrMap[$err];
+            if (empty($errStr)) {
+                $errStr = " - unknow error, error code ({$err})";
+            }
+            throw new Exception("server result error($err) {$errStr}:$result");
+        }
+
+        if (property_exists($obj, "error_type")) {
+            $expClass = Exception::getExceptionClassNameByErrorType($obj->error_type);
+            if (class_exists($expClass)) {
+                throw new $expClass($obj->message, $obj->code);
+            } else {
+                throw new Exception($obj->message, $obj->code);
+            }
+        }
+        return $obj;
     }
 
 }
