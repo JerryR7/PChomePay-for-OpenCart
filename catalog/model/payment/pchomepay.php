@@ -81,6 +81,46 @@ class ModelPaymentPChomePay extends Model
         return $baseURL;
     }
 
+    // 建立訂單
+    public function postPayment($data)
+    {
+        $token = $this->getToken();
+        $postPaymentURL = $this->baseURL() . '/payment';
+
+        $result = $this->postAPI($token, $postPaymentURL, $data);
+
+        return $this->handleResult($result);
+    }
+
+    // 建立退款
+    public function postRefund($data)
+    {
+        $token = $this->getToken();
+        $postRefundURL = $this->baseURL() . '/refund';
+
+        $result = $this->postAPI($token, $postRefundURL, $data);
+
+        return $this->handleResult($result);
+
+    }
+
+    // 查詢訂單
+    public function getPayment($orderID)
+    {
+        if (!is_string($orderID) || stristr($orderID, "/")) {
+            throw new Exception('Order does not exist!', 20002);
+        }
+
+        $token = $this->getToken();
+        $getPaymentURL = $this->baseURL() . '/payment/{order_id}';
+
+        $result = $this->getAPI($token, str_replace("{order_id}", $orderID, $getPaymentURL));
+
+        return $this->handleResult($result);
+
+    }
+
+    // 取Token
     public function getToken()
     {
         $tokenURL = $this->baseURL() . "/token";
@@ -92,12 +132,31 @@ class ModelPaymentPChomePay extends Model
         $userAuth = "{$appID}:{$secret}";
 
         $body = $this->postToken($userAuth, $tokenURL);
-        $this->handleResult($body);
-        $this->token = new PPToken($body);
-        $this->tokenStorage->saveTokenStr($this->token->getJson());
 
-        return $this->token;
+        return $this->handleResult($body);
     }
+
+    /**
+     * @param $url
+     * @param $userAuth
+     * @return string
+     */
+    private function postToken($userAuth, $url)
+    {
+        return $this->post($url, null, [], ["CURLOPT_USERPWD" => $userAuth]);
+    }
+
+    private function postAPI($token, $url, $data)
+    {
+        return $this->post($url, null, ["pcpay-token: {$token}"], ["CURLOPT_POSTFIELDS" => $data]);
+    }
+
+    private function getAPI($token, $url, $data = [])
+    {
+        return $this->get($url, $data, ["pcpay-token: $token"]);
+
+    }
+
 
     /**
      * @param $url
@@ -107,7 +166,7 @@ class ModelPaymentPChomePay extends Model
      * @param int $timeout
      * @return mixed
      */
-    public function post($url, $params, array $headers = null, array $settings = [], $timeout = 500)
+    private function post($url, $params, array $headers = null, array $settings = [], $timeout = 500)
     {
         $reqData = $this->parseReqData($params);
 
@@ -163,20 +222,50 @@ class ModelPaymentPChomePay extends Model
         return $reqData;
     }
 
-
-    /**
-     * @param $url
-     * @param $userAuth
-     * @return string
-     */
-    public function postToken($userAuth, $url)
+    private function get($url, $params, array $headers = null, array $settings = [], $timeout = 500)
     {
-        return $this->post($url, null, [], ["CURLOPT_USERPWD" => $userAuth]);
-    }
+        $query = "?";
 
-    public function postAPI($token, $url, $data)
-    {
-        return $this->post($url, null, ["pcpay-token: {$token}"], ["CURLOPT_POSTFIELDS" => $data]);
+        if ($params !== null) {
+            $query .= http_build_query($params);
+        }
+
+        $query .= "&xdebug_session_start=PHPSTORM";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url . $query);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+
+        if ($headers !== null) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
+        if ($this->ignoreSSL) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        }
+
+        if (!empty($settings)) {
+            foreach ($settings as $key => $value) {
+                if (defined($key)) {
+                    curl_setopt($ch, constant($key), $value);
+                }
+            }
+        }
+
+        $content = curl_exec($ch);
+
+        $err = curl_errno($ch);
+
+        if ($err) {
+            $errMessage = "curl error => (" . $err . ")" . curl_error($ch);
+            curl_close($ch);
+            throw new RuntimeException($errMessage);
+        }
+
+        curl_close($ch);
+        return $content;
     }
 
     private function handleResult($result)
@@ -214,6 +303,10 @@ class ModelPaymentPChomePay extends Model
             }
         }
         return $obj;
+    }
+
+    public function formatOrderTotal($order_total) {
+        return intval(round($order_total));
     }
 
 }

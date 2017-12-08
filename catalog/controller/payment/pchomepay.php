@@ -27,8 +27,12 @@ class ControllerPaymentPChomePay extends Controller
         $baseURL = $data['testmode'] ? ControllerPaymentPChomePay::SB_BASE_URL : ControllerPaymentPChomePay::BASE_URL;
 
         $this->load->model('checkout/order');
+        $this->load->model('payment/pchomepay');
 
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $postPaymentData = $this->getPChomepayPaymentData();
+
+
+        exit();
 
         if ($order_info) {
             $data['item_name'] = html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8');
@@ -114,6 +118,83 @@ class ControllerPaymentPChomePay extends Controller
         $data['action'] = 'https://123.123.123';
 
         return $this->load->view('payment/pchomepay', $data);
+    }
+
+    private function getPChomepayPaymentData()
+    {
+        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+
+        if ($order_info) {
+            $order_id = date('Ymd') . $order_info['order_id'];
+            $pay_type = $this->config->get('pchomepay_payment_methods');
+            $amount = $this->model_payment_pchomepay->formatOrderTotal($order_info['total']);
+            $return_url = $this->url->link('checkout/success');
+            $notify_url = $this->url->link('payment/pchomepay/callback', '', true);
+            $buyer_email = $order_info['email'];
+
+            $atm_expiredate = $this->config->get('pchomepay_atm_expiredate');
+
+            if (isset($atm_expiredate) && (!preg_match('/^\d*$/', $atm_expiredate) || $atm_expiredate < 1 || $atm_expiredate > 5)) {
+                $atm_expiredate = 5;
+            }
+
+            $atm_info = (object)['expire_days' => (int)$atm_expiredate];
+
+            $this->config->get('');
+            $card_info = [];
+
+            foreach ($this->card_installment as $items) {
+                switch ($items) {
+                    case 'CARD_3' :
+                        $card_installment['installment'] = 3;
+                        break;
+                    case 'CARD_6' :
+                        $card_installment['installment'] = 6;
+                        break;
+                    case 'CARD_12' :
+                        $card_installment['installment'] = 12;
+                        break;
+                    default :
+                        unset($card_installment);
+                        break;
+                }
+                if (isset($card_installment)) {
+                    $card_info[] = (object)$card_installment;
+                }
+            }
+
+            $items = [];
+
+            $order_items = $order->get_items();
+            foreach ($order_items as $item) {
+                $product = [];
+                $order_item = new WC_Order_Item_Product($item);
+                $product_id = ($order_item->get_product_id());
+                $product['name'] = $order_item->get_name();
+                $product['url'] = get_permalink($product_id);
+
+                $items[] = (object)$product;
+            }
+
+            $pchomepay_args = [
+                'order_id' => $order_id,
+                'pay_type' => $pay_type,
+                'amount' => $amount,
+                'return_url' => $return_url,
+                'notify_url' => $notify_url,
+                'items' => $items,
+                'buyer_email' => $buyer_email,
+                'atm_info' => $atm_info,
+            ];
+
+            if ($card_info) $pchomepay_args['card_info'] = $card_info;
+
+            $pchomepay_args = apply_filters('woocommerce_pchomepay_args', $pchomepay_args);
+
+            return $pchomepay_args;
+        }
+
+        return null;
     }
 
     public function callback()

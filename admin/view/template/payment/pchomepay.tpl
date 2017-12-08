@@ -149,6 +149,61 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-2 control-label">
+                                    <?php echo $entry_card_installment; ?>
+                                </label>
+                                <div class="col-sm-2">
+                                    <?php $checked = ' checked="checked"'; ?>
+                                    <input type="checkbox" name="pchomepay_card_installment_0" value="card_0"<?php if (isset($pchomepay_payment_methods['CARD'])) { echo $checked; }?>/>
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_card; ?>
+                                    </label>
+                                    <br/>
+                                    <input type="checkbox" name="pchomepay_payment_methods[ATM]" value="card_3"<?php if (isset($pchomepay_payment_methods['ATM'])) { echo $checked; }?>/>
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_atm; ?>
+                                    </label>
+                                    <br/>
+                                    <input type="checkbox" name="pchomepay_payment_methods[EACH]" value="card_6"<?php if (isset($pchomepay_payment_methods['EACH'])) { echo $checked; }?>/>
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_each; ?>
+                                    </label>
+                                    <br/>
+                                    <input type="checkbox" name="pchomepay_payment_methods[ACCT]" value="card_12"<?php if (isset($pchomepay_payment_methods['ACCT'])) { echo $checked; }?>/>
+                                    <label class="control-label">
+                                        &nbsp;<?php echo $text_acct; ?>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label"
+                                       for="entry-atm-expiredate"><?php echo $entry_atm_expiredate; ?></label>
+                                <div class="col-sm-10">
+                                    <input type="text" name="pchomepay_atm_expiredate"
+                                           value="<?php echo $pchomepay_atm_expiredate; ?>"
+                                           placeholder="<?php echo $entry_atm_expiredate; ?>" id="entry-atm-expiredate"
+                                           class="form-control"/>
+                                    <?php if ($error_atm_expiredate) { ?>
+                                    <div class="text-danger"><?php echo $error_atm_expiredate; ?></div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                            <div class="form-group required">
+                                <label class="col-sm-2 control-label"
+                                       for="input-cover-transfee"><?php echo $entry_cover_transfee; ?></label>
+                                <div class="col-sm-10">
+                                    <select name="pchomepay_cover_transfee" id="input-cover-transfee" class="form-control">
+                                        <?php if ($pchomepay_atm_expiredate) { ?>
+                                        <option value="1" selected="selected"><?php echo $text_yes; ?></option>
+                                        <option value="0"><?php echo $text_no; ?></option>
+                                        <?php } else { ?>
+                                        <option value="1"><?php echo $text_yes; ?></option>
+                                        <option value="0" selected="selected"><?php echo $text_no; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-2 control-label"
                                        for="input-geo-zone"><?php echo $entry_geo_zone; ?></label>
                                 <div class="col-sm-10">

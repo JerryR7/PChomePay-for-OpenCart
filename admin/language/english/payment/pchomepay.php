@@ -19,6 +19,10 @@ $_['text_card'] = 'Credit Card';
 $_['text_atm'] = 'ATM';
 $_['text_each'] = 'e-ACH';
 $_['text_acct'] = 'PChomaPay Account';
+$_['text_card_0'] = 'At Once';
+$_['text_card_3'] = '3 installments';
+$_['text_card_6'] = '6 installments';
+$_['text_card_12'] = '12 installments';
 
 // Entry
 $_['entry_status'] = 'Status';
@@ -29,6 +33,9 @@ $_['entry_test'] = 'Sandbox Mode';
 $_['entry_debug'] = 'Debug Mode';
 $_['entry_geo_zone'] = 'Geo Zone';
 $_['entry_payment_methods'] = 'Payment Methods';
+$_['entry_card_installment'] = 'Card Installment';
+$_['entry_atm_expiredate'] = 'ATM Expire Date';
+$_['entry_cover_transfee'] = 'Inter-bank Transfer Fee';
 
 $_['entry_canceled_reversal_status'] = 'Canceled Reversal Status';
 $_['entry_completed_status'] = 'Completed Status';
@@ -54,3 +61,6 @@ $_['error_permission'] = 'Warning: You do not have permission to modify payment 
 $_['error_appid'] = 'APP ID required!';
 $_['error_secret'] = 'SECRET required!';
 $_['error_sandbox_secret'] = 'SandBox SECRET required!';
+$_['error_atm_expiredate_required'] = 'ATM Expire Date required!';
+$_['error_atm_expiredate_number'] = 'ATM Expire Date must in 1~5 days';
+$_['error_cover_transfee'] = 'Inter-bank Transfer Fee required!';
