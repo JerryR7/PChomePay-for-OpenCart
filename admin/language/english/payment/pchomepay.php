@@ -64,3 +64,4 @@ $_['error_sandbox_secret'] = 'SandBox SECRET required!';
 $_['error_atm_expiredate_required'] = 'ATM Expire Date required!';
 $_['error_atm_expiredate_number'] = 'ATM Expire Date must in 1~5 days';
 $_['error_cover_transfee'] = 'Inter-bank Transfer Fee required!';
+$_['error_payment_methods'] = 'Payment Methods required!';

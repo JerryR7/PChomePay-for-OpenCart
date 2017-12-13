@@ -37,6 +37,10 @@ class ControllerPaymentPChomePay extends Controller
         $data['text_atm'] = $this->language->get('text_atm');
         $data['text_each'] = $this->language->get('text_each');
         $data['text_acct'] = $this->language->get('text_acct');
+        $data['text_card_0'] = $this->language->get('text_card_0');
+        $data['text_card_3'] = $this->language->get('text_card_3');
+        $data['text_card_6'] = $this->language->get('text_card_6');
+        $data['text_card_12'] = $this->language->get('text_card_12');
 
         $data['entry_status'] = $this->language->get('entry_status');
         $data['entry_appid'] = $this->language->get('entry_appid');
@@ -99,6 +103,12 @@ class ControllerPaymentPChomePay extends Controller
             $data['error_cover_transfee'] = $this->error['cover_transfee'];
         } else {
             $data['error_cover_transfee'] = '';
+        }
+
+        if (isset($this->error['payment_methods'])) {
+            $data['error_payment_methods'] = $this->error['payment_methods'];
+        } else {
+            $data['error_payment_methods'] = '';
         }
 
         $data['breadcrumbs'] = array();
@@ -228,11 +238,12 @@ class ControllerPaymentPChomePay extends Controller
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
-        if (!$this->request->post['pchomepay_appid'] || !$this->request->post['pchomepay_secret'] || !$this->request->post['pchomepay_cover_transfee'] || !$this->request->post['pchomepay_atm_expiredate']) {
+        if (!$this->request->post['pchomepay_appid'] || !$this->request->post['pchomepay_secret'] || !$this->request->post['pchomepay_cover_transfee'] || !$this->request->post['pchomepay_atm_expiredate'] || !$this->request->post['pchomepay_payment_methods']) {
             $this->error['appid'] = $this->language->get('error_appid');
             $this->error['secret'] = $this->language->get('error_secret');
             $this->error['atm_expiredate'] = $this->language->get('error_atm_expiredate');
             $this->error['cover_transfee'] = $this->language->get('error_cover_transfee');
+            $this->error['payment_methods'] = $this->language->get('error_payment_methods');
         }
 
         if (isset($this->request->post['pchomepay_atm_expiredate']) && (!preg_match('/^\d*$/', $this->request->post['pchomepay_atm_expiredate']) || $this->request->post['pchomepay_atm_expiredate'] < 1 || $this->request->post['pchomepay_atm_expiredate'] > 5)) {

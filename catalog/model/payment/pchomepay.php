@@ -176,6 +176,7 @@ class ModelPaymentPChomePay extends Model
         curl_setopt($ch, CURLOPT_POSTFIELDS, $reqData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
         if ($headers !== null) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -295,18 +296,23 @@ class ModelPaymentPChomePay extends Model
         }
 
         if (property_exists($obj, "error_type")) {
-            $expClass = Exception::getExceptionClassNameByErrorType($obj->error_type);
-            if (class_exists($expClass)) {
-                throw new $expClass($obj->message, $obj->code);
-            } else {
-                throw new Exception($obj->message, $obj->code);
-            }
+            throw new Exception($obj->message, $obj->code);
         }
+
         return $obj;
     }
 
-    public function formatOrderTotal($order_total) {
+    public function formatOrderTotal($order_total)
+    {
         return intval(round($order_total));
+    }
+
+    public function ocLog($message)
+    {
+        $message = json_encode($message);
+        $today = date('Ymd');
+        $log = new Log("PChomePay-{$today}.log");
+        $log->write('class ' . get_class() . ' : ' . $message . "\n");
     }
 
 }

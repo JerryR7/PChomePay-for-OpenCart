@@ -31,87 +31,20 @@ class ControllerPaymentPChomePay extends Controller
 
         $postPaymentData = $this->getPChomepayPaymentData();
 
+        if ($postPaymentData) {
+            try {
+                // 建立訂單
+                $result = $this->model_payment_pchomepay->postPayment($postPaymentData);
 
-        exit();
+                $this->ocLog($result);exit();
 
-        if ($order_info) {
-            $data['item_name'] = html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8');
-
-            foreach ($this->cart->getProducts() as $product) {
-                $option_data = array();
-
-                foreach ($product['option'] as $option) {
-                    if ($option['type'] != 'file') {
-                        $value = $option['value'];
-                    } else {
-                        $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
-
-                        if ($upload_info) {
-                            $value = $upload_info['name'];
-                        } else {
-                            $value = '';
-                        }
-                    }
-
-                    $option_data[] = array(
-                        'name'  => $option['name'],
-                        'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
-                    );
+                if (!$result) {
+                    $this->ocLog("交易失敗：伺服器端未知錯誤，請聯絡 PChomePay支付連。");
+                    throw new Exception("嘗試使用付款閘道 API 建立訂單時發生錯誤，請聯絡網站管理員。");
                 }
-
-                $data['products'][] = array(
-                    'name'     => htmlspecialchars($product['name']),
-                    'model'    => htmlspecialchars($product['model']),
-                    'price'    => $this->currency->format($product['price'], $order_info['currency_code'], false, false),
-                    'quantity' => $product['quantity'],
-                    'option'   => $option_data,
-                    'weight'   => $product['weight']
-                );
+            } catch (Exception $exception) {
+                $this->ocLog($exception->getMessage());
             }
-
-            $data['discount_amount_cart'] = 0;
-
-            $total = $this->currency->format($order_info['total'] - $this->cart->getSubTotal(), $order_info['currency_code'], false, false);
-
-            if ($total > 0) {
-                $data['products'][] = array(
-                    'name'     => $this->language->get('text_total'),
-                    'model'    => '',
-                    'price'    => $total,
-                    'quantity' => 1,
-                    'option'   => array(),
-                    'weight'   => 0
-                );
-            } else {
-                $data['discount_amount_cart'] -= $total;
-            }
-
-            $data['currency_code'] = $order_info['currency_code'];
-            $data['first_name'] = html_entity_decode($order_info['payment_firstname'], ENT_QUOTES, 'UTF-8');
-            $data['last_name'] = html_entity_decode($order_info['payment_lastname'], ENT_QUOTES, 'UTF-8');
-            $data['address1'] = html_entity_decode($order_info['payment_address_1'], ENT_QUOTES, 'UTF-8');
-            $data['address2'] = html_entity_decode($order_info['payment_address_2'], ENT_QUOTES, 'UTF-8');
-            $data['city'] = html_entity_decode($order_info['payment_city'], ENT_QUOTES, 'UTF-8');
-            $data['zip'] = html_entity_decode($order_info['payment_postcode'], ENT_QUOTES, 'UTF-8');
-            $data['country'] = $order_info['payment_iso_code_2'];
-            $data['email'] = $order_info['email'];
-            $data['invoice'] = $this->session->data['order_id'] . ' - ' . html_entity_decode($order_info['payment_firstname'], ENT_QUOTES, 'UTF-8') . ' ' . html_entity_decode($order_info['payment_lastname'], ENT_QUOTES, 'UTF-8');
-            $data['lc'] = $this->session->data['language'];
-            $data['return'] = $this->url->link('checkout/success');
-            $data['notify_url'] = $this->url->link('payment/pchomepay/callback', '', true);
-            $data['cancel_return'] = $this->url->link('checkout/checkout', '', true);
-
-            if (!$this->config->get('pchomepay_transaction')) {
-                $data['paymentaction'] = 'authorization';
-            } else {
-                $data['paymentaction'] = 'sale';
-            }
-
-            $data['custom'] = $this->session->data['order_id'];
-
-            $this->ocLog(json_encode($data));
-
-            return $this->load->view('payment/pchomepay', $data);
         }
 
         $data['custom'] = $this->session->data['order_id'];
@@ -126,7 +59,7 @@ class ControllerPaymentPChomePay extends Controller
 
         if ($order_info) {
             $order_id = date('Ymd') . $order_info['order_id'];
-            $pay_type = $this->config->get('pchomepay_payment_methods');
+            $payment_methods = $this->config->get('pchomepay_payment_methods');
             $amount = $this->model_payment_pchomepay->formatOrderTotal($order_info['total']);
             $return_url = $this->url->link('checkout/success');
             $notify_url = $this->url->link('payment/pchomepay/callback', '', true);
@@ -138,20 +71,26 @@ class ControllerPaymentPChomePay extends Controller
                 $atm_expiredate = 5;
             }
 
+            $pay_type = [];
+
+            foreach ($payment_methods as $method) {
+                $pay_type[] = $method;
+            }
+
             $atm_info = (object)['expire_days' => (int)$atm_expiredate];
 
-            $this->config->get('');
+            $card_installment = $this->config->get('pchomepay_card_installment');
             $card_info = [];
 
-            foreach ($this->card_installment as $items) {
+            foreach ($card_installment as $items) {
                 switch ($items) {
-                    case 'CARD_3' :
+                    case 'CARD_3':
                         $card_installment['installment'] = 3;
                         break;
-                    case 'CARD_6' :
+                    case 'CARD_6':
                         $card_installment['installment'] = 6;
                         break;
-                    case 'CARD_12' :
+                    case 'CARD_12':
                         $card_installment['installment'] = 12;
                         break;
                     default :
@@ -165,13 +104,10 @@ class ControllerPaymentPChomePay extends Controller
 
             $items = [];
 
-            $order_items = $order->get_items();
-            foreach ($order_items as $item) {
+            foreach ($this->cart->getProducts() as $item) {
                 $product = [];
-                $order_item = new WC_Order_Item_Product($item);
-                $product_id = ($order_item->get_product_id());
-                $product['name'] = $order_item->get_name();
-                $product['url'] = get_permalink($product_id);
+                $product['name'] = $item['name'];
+                $product['url'] = $this->url->link('product/product', 'product_id=' . $item['product_id']);;
 
                 $items[] = (object)$product;
             }
@@ -189,8 +125,6 @@ class ControllerPaymentPChomePay extends Controller
 
             if ($card_info) $pchomepay_args['card_info'] = $card_info;
 
-            $pchomepay_args = apply_filters('woocommerce_pchomepay_args', $pchomepay_args);
-
             return $pchomepay_args;
         }
 
@@ -203,9 +137,9 @@ class ControllerPaymentPChomePay extends Controller
     }
 
 
-
     public function ocLog($message)
     {
+        $message = json_encode($message);
         $today = date('Ymd');
         $log = new Log("PChomePay-{$today}.log");
         $log->write('class ' . get_class() . ' : ' . $message . "\n");
