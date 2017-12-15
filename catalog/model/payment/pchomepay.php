@@ -84,7 +84,7 @@ class ModelPaymentPChomePay extends Model
     // 建立訂單
     public function postPayment($data)
     {
-        $token = $this->getToken();
+        $token = $this->getToken()->token;
         $postPaymentURL = $this->baseURL() . '/payment';
 
         $result = $this->postAPI($token, $postPaymentURL, $data);
@@ -95,7 +95,7 @@ class ModelPaymentPChomePay extends Model
     // 建立退款
     public function postRefund($data)
     {
-        $token = $this->getToken();
+        $token = $this->getToken()->token;
         $postRefundURL = $this->baseURL() . '/refund';
 
         $result = $this->postAPI($token, $postRefundURL, $data);
@@ -111,7 +111,7 @@ class ModelPaymentPChomePay extends Model
             throw new Exception('Order does not exist!', 20002);
         }
 
-        $token = $this->getToken();
+        $token = $this->getToken()->token;
         $getPaymentURL = $this->baseURL() . '/payment/{order_id}';
 
         $result = $this->getAPI($token, str_replace("{order_id}", $orderID, $getPaymentURL));
@@ -176,7 +176,7 @@ class ModelPaymentPChomePay extends Model
         curl_setopt($ch, CURLOPT_POSTFIELDS, $reqData);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 
         if ($headers !== null) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);

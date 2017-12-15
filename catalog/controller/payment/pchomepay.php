@@ -17,6 +17,13 @@ class ControllerPaymentPChomePay extends Controller
 
     public function index()
     {
+        $data['action'] = $this->url->link('payment/pchomepay/redirect', '', 'SSL');;
+
+        return $this->load->view('payment/pchomepay', $data);
+    }
+
+    public function redirect()
+    {
         $this->load->language('payment/pchomepay');
 
         $data['text_testmode'] = $this->language->get('text_testmode');
@@ -49,8 +56,6 @@ class ControllerPaymentPChomePay extends Controller
 
         $data['custom'] = $this->session->data['order_id'];
         $data['action'] = 'https://123.123.123';
-
-        return $this->load->view('payment/pchomepay', $data);
     }
 
     private function getPChomepayPaymentData()
@@ -125,7 +130,7 @@ class ControllerPaymentPChomePay extends Controller
 
             if ($card_info) $pchomepay_args['card_info'] = $card_info;
 
-            return $pchomepay_args;
+            return json_encode($pchomepay_args);
         }
 
         return null;
