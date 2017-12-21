@@ -17,33 +17,29 @@ class ControllerPaymentPChomePay extends Controller
 
     public function index()
     {
-        $data['action'] = $this->url->link('payment/pchomepay/redirect', '', 'SSL');;
+        $this->load->language('payment/pchomepay');
+
+        $data['text_testmode'] = $this->language->get('text_testmode');
+        $data['button_confirm'] = $this->language->get('button_confirm');
+        $data['testmode'] = $this->config->get('pchomepay_test');
+        $data['action'] = $this->url->link('payment/pchomepay/redirect', '', 'SSL');
 
         return $this->load->view('payment/pchomepay', $data);
     }
 
     public function redirect()
     {
-        $this->load->language('payment/pchomepay');
-
-        $data['text_testmode'] = $this->language->get('text_testmode');
-        $data['button_confirm'] = $this->language->get('button_confirm');
-
-        $data['testmode'] = $this->config->get('pchomepay_test');
-
-        $baseURL = $data['testmode'] ? ControllerPaymentPChomePay::SB_BASE_URL : ControllerPaymentPChomePay::BASE_URL;
-
         $this->load->model('checkout/order');
         $this->load->model('payment/pchomepay');
 
-        $postPaymentData = $this->getPChomepayPaymentData();
+        $order_id = $this->session->data['order_id'];
+
+        $postPaymentData = $this->getPChomepayPaymentData($order_id);
 
         if ($postPaymentData) {
             try {
                 // 建立訂單
                 $result = $this->model_payment_pchomepay->postPayment($postPaymentData);
-
-                $this->ocLog($result);exit();
 
                 if (!$result) {
                     $this->ocLog("交易失敗：伺服器端未知錯誤，請聯絡 PChomePay支付連。");
@@ -54,13 +50,49 @@ class ControllerPaymentPChomePay extends Controller
             }
         }
 
-        $data['custom'] = $this->session->data['order_id'];
-        $data['action'] = 'https://123.123.123';
+        # Clean the cart
+        $this->cart->clear();
+
+        # Add to activity log
+        $this->load->model('account/activity');
+        if ($this->customer->isLogged()) {
+            $activity_data = array(
+                'customer_id' => $this->customer->getId(),
+                'name'        => $this->customer->getFirstName() . ' ' . $this->customer->getLastName(),
+                'order_id'    => $order_id
+            );
+
+            $this->model_account_activity->addActivity('order_account', $activity_data);
+        } else {
+            $activity_data = array(
+                'name'     => $this->session->data['guest']['firstname'] . ' ' . $this->session->data['guest']['lastname'],
+                'order_id' => $order_id
+            );
+
+            $this->model_account_activity->addActivity('order_guest', $activity_data);
+        }
+
+        # Clean the session
+        unset($this->session->data['shipping_method']);
+        unset($this->session->data['shipping_methods']);
+        unset($this->session->data['payment_method']);
+        unset($this->session->data['payment_methods']);
+        unset($this->session->data['guest']);
+        unset($this->session->data['comment']);
+        unset($this->session->data['order_id']);
+        unset($this->session->data['coupon']);
+        unset($this->session->data['reward']);
+        unset($this->session->data['voucher']);
+        unset($this->session->data['vouchers']);
+        unset($this->session->data['totals']);
+
+        $this->response->redirect($result->payment_url);
+        exit();
     }
 
-    private function getPChomepayPaymentData()
+    private function getPChomepayPaymentData($order_id)
     {
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        $order_info = $this->model_checkout_order->getOrder($order_id);
 
         if ($order_info) {
             $order_id = date('Ymd') . $order_info['order_id'];
@@ -138,7 +170,61 @@ class ControllerPaymentPChomePay extends Controller
 
     public function callback()
     {
+        $this->load->language('payment/allpay');
+        $this->load->model('payment/allpay');
+        $this->load->model('checkout/order');
 
+        $notify_type = $_REQUEST['notify_type'];
+        $notify_message = $_REQUEST['notify_message'];
+
+        $this->ocLog($notify_type);
+        $this->ocLog($notify_message);
+
+        if (!$notify_type || !$notify_message) {
+            http_response_code(404);
+            exit;
+        }
+
+        $order_data = json_decode(str_replace('\"', '"', $notify_message));
+
+        # 紀錄訂單付款方式
+        switch ($order_data->pay_type) {
+            case 'ATM':
+                $pay_type_note = 'ATM 付款';
+                break;
+            case 'CARD':
+                if ($order_data->payment_info->installment == 1) {
+                    $pay_type_note = '信用卡 付款 (一次付清)';
+                } else {
+                    $pay_type_note = '信用卡 分期付款 (' . $order_data->payment_info->installment . '期)';
+                }
+                break;
+            case 'ACCT':
+                $pay_type_note = '支付連餘額 付款';
+                break;
+            case 'EACH':
+                $pay_type_note = '銀行支付 付款';
+                break;
+            default:
+                $pay_type_note = $order_data->pay_type . '付款';
+        }
+
+        if ($notify_type == 'order_expired') {
+            $order->add_order_note($pay_type_note, true);
+            if ($order_data->status_code) {
+                $order->update_status('failed');
+                $order->add_order_note(sprintf(__('訂單已失敗。<br>error code: %1$s<br>message: %2$s', 'woocommerce'), $order_data->status_code, OrderStatusCodeEnum::getErrMsg($order_data->status_code)), true);
+            } else {
+                $order->update_status('failed');
+                $order->add_order_note( '訂單已失敗。', true);
+            }
+        } elseif ($notify_type == 'order_confirm') {
+            $order->add_order_note($pay_type_note, true);
+            $order->payment_complete();
+        }
+
+        echo 'success';
+        exit();
     }
 
 
