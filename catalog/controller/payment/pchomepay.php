@@ -50,6 +50,10 @@ class ControllerPaymentPChomePay extends Controller
             }
         }
 
+        # Update order status and comments
+        $order_status_id = $this->config->get('config_order_status_id');
+        $this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
+
         # Clean the cart
         $this->cart->clear();
 
@@ -95,7 +99,7 @@ class ControllerPaymentPChomePay extends Controller
         $order_info = $this->model_checkout_order->getOrder($order_id);
 
         if ($order_info) {
-            $order_id = date('Ymd') . $order_info['order_id'];
+            $order_id = 'AO' . date('Ymd') . $order_info['order_id'];
             $payment_methods = $this->config->get('pchomepay_payment_methods');
             $amount = $this->model_payment_pchomepay->formatOrderTotal($order_info['total']);
             $return_url = $this->url->link('checkout/success');
@@ -174,18 +178,20 @@ class ControllerPaymentPChomePay extends Controller
         $this->load->model('payment/allpay');
         $this->load->model('checkout/order');
 
-        $notify_type = $_REQUEST['notify_type'];
-        $notify_message = $_REQUEST['notify_message'];
 
-        $this->ocLog($notify_type);
-        $this->ocLog($notify_message);
-
-        if (!$notify_type || !$notify_message) {
+        if (!isset($_REQUEST['notify_type']) || !isset($_REQUEST['notify_message'])) {
             http_response_code(404);
             exit;
         }
 
+        $notify_type = $_REQUEST['notify_type'];
+        $notify_message = $_REQUEST['notify_message'];
+
         $order_data = json_decode(str_replace('\"', '"', $notify_message));
+
+        $this->ocLog($notify_type);
+        $this->ocLog($order_data);
+
 
         # 紀錄訂單付款方式
         switch ($order_data->pay_type) {
@@ -209,8 +215,19 @@ class ControllerPaymentPChomePay extends Controller
                 $pay_type_note = $order_data->pay_type . '付款';
         }
 
+        //  order status
+        //       1        Pending       訂單剛剛創建,等待處理.
+        //       2        Processing    當客戶付款完成,訂單狀態即為處理中.
+        //       3        Shipped       當訂單已發出,訂單狀態請設為Shipped.
+        //       5        Complete      客戶已確認收貨,訂單狀態請設為Complete.
+        //       7        Cancelled     出於某些原因,訂單取消.請將訂單狀態設為Cancelled.
+        //      10        Failed        訂單失敗
+        //      11        Refunded      如客戶退貨或退款.訂單狀態請設為Refunded.
+        //      14        Expired       訂單逾期
+
         if ($notify_type == 'order_expired') {
-            $order->add_order_note($pay_type_note, true);
+            $order_status_id = $this->config->get('config_order_status_id');
+            $this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
             if ($order_data->status_code) {
                 $order->update_status('failed');
                 $order->add_order_note(sprintf(__('訂單已失敗。<br>error code: %1$s<br>message: %2$s', 'woocommerce'), $order_data->status_code, OrderStatusCodeEnum::getErrMsg($order_data->status_code)), true);

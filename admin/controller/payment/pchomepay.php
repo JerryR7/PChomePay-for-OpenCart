@@ -53,7 +53,6 @@ class ControllerPaymentPChomePay extends Controller
         $data['entry_payment_methods'] = $this->language->get('entry_payment_methods');
         $data['entry_card_installment'] = $this->language->get('entry_card_installment');
         $data['entry_atm_expiredate'] = $this->language->get('entry_atm_expiredate');
-        $data['entry_cover_transfee'] = $this->language->get('entry_cover_transfee');
 
         $data['entry_canceled_reversal_status'] = $this->language->get('entry_canceled_reversal_status');
         $data['entry_completed_status'] = $this->language->get('entry_completed_status');
@@ -99,12 +98,6 @@ class ControllerPaymentPChomePay extends Controller
             $data['error_atm_expiredate'] = '';
         }
 
-        if (isset($this->error['cover_transfee'])) {
-            $data['error_cover_transfee'] = $this->error['cover_transfee'];
-        } else {
-            $data['error_cover_transfee'] = '';
-        }
-
         if (isset($this->error['payment_methods'])) {
             $data['error_payment_methods'] = $this->error['payment_methods'];
         } else {
@@ -143,7 +136,6 @@ class ControllerPaymentPChomePay extends Controller
             'payment_methods',
             'card_installment',
             'atm_expiredate',
-            'cover_transfee',
             'geo_zone_id',
             'sort_order'
         );
@@ -238,11 +230,10 @@ class ControllerPaymentPChomePay extends Controller
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
-        if (!$this->request->post['pchomepay_appid'] || !$this->request->post['pchomepay_secret'] || !$this->request->post['pchomepay_cover_transfee'] || !$this->request->post['pchomepay_atm_expiredate'] || !$this->request->post['pchomepay_payment_methods']) {
+        if (!$this->request->post['pchomepay_appid'] || !$this->request->post['pchomepay_secret'] || !$this->request->post['pchomepay_atm_expiredate'] || !$this->request->post['pchomepay_payment_methods']) {
             $this->error['appid'] = $this->language->get('error_appid');
             $this->error['secret'] = $this->language->get('error_secret');
             $this->error['atm_expiredate'] = $this->language->get('error_atm_expiredate');
-            $this->error['cover_transfee'] = $this->language->get('error_cover_transfee');
             $this->error['payment_methods'] = $this->language->get('error_payment_methods');
         }
 

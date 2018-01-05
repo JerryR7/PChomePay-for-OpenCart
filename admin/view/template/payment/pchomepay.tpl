@@ -193,21 +193,6 @@
                                     <?php } ?>
                                 </div>
                             </div>
-                            <div class="form-group required">
-                                <label class="col-sm-2 control-label"
-                                       for="input-cover-transfee"><?php echo $entry_cover_transfee; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_cover_transfee" id="input-cover-transfee" class="form-control">
-                                        <?php if ($pchomepay_atm_expiredate) { ?>
-                                        <option value="1" selected="selected"><?php echo $text_yes; ?></option>
-                                        <option value="0"><?php echo $text_no; ?></option>
-                                        <?php } else { ?>
-                                        <option value="1"><?php echo $text_yes; ?></option>
-                                        <option value="0" selected="selected"><?php echo $text_no; ?></option>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"
                                        for="input-geo-zone"><?php echo $entry_geo_zone; ?></label>
