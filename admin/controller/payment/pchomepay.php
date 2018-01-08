@@ -54,16 +54,12 @@ class ControllerPaymentPChomePay extends Controller
         $data['entry_card_installment'] = $this->language->get('entry_card_installment');
         $data['entry_atm_expiredate'] = $this->language->get('entry_atm_expiredate');
 
-        $data['entry_canceled_reversal_status'] = $this->language->get('entry_canceled_reversal_status');
         $data['entry_completed_status'] = $this->language->get('entry_completed_status');
-        $data['entry_denied_status'] = $this->language->get('entry_denied_status');
         $data['entry_expired_status'] = $this->language->get('entry_expired_status');
         $data['entry_failed_status'] = $this->language->get('entry_failed_status');
         $data['entry_pending_status'] = $this->language->get('entry_pending_status');
         $data['entry_processed_status'] = $this->language->get('entry_processed_status');
         $data['entry_refunded_status'] = $this->language->get('entry_refunded_status');
-        $data['entry_reversed_status'] = $this->language->get('entry_reversed_status');
-        $data['entry_voided_status'] = $this->language->get('entry_voided_status');
 
         $data['help_test'] = $this->language->get('help_test');
         $data['help_debug'] = $this->language->get('help_debug');
@@ -71,8 +67,8 @@ class ControllerPaymentPChomePay extends Controller
         $data['button_save'] = $this->language->get('button_save');
         $data['button_cancel'] = $this->language->get('button_cancel');
 
-        $data['tab_general'] = $this->language->get('tab_general');
-        $data['tab_order_status'] = $this->language->get('tab_order_status');
+//        $data['tab_general'] = $this->language->get('tab_general');
+//        $data['tab_order_status'] = $this->language->get('tab_order_status');
 
         if (isset($this->error['warning'])) {
             $data['error_warning'] = $this->error['warning'];
@@ -148,66 +144,6 @@ class ControllerPaymentPChomePay extends Controller
             } else {
                 $data[$pchomepay_setting_name] = $this->config->get($pchomepay_setting_name);
             }
-        }
-
-        if (isset($this->request->post['pchomepay_canceled_reversal_status_id'])) {
-            $data['pchomepay_canceled_reversal_status_id'] = $this->request->post['pchomepay_canceled_reversal_status_id'];
-        } else {
-            $data['pchomepay_canceled_reversal_status_id'] = $this->config->get('pchomepay_canceled_reversal_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_completed_status_id'])) {
-            $data['pchomepay_completed_status_id'] = $this->request->post['pchomepay_completed_status_id'];
-        } else {
-            $data['pchomepay_completed_status_id'] = $this->config->get('pchomepay_completed_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_denied_status_id'])) {
-            $data['pchomepay_denied_status_id'] = $this->request->post['pchomepay_denied_status_id'];
-        } else {
-            $data['pchomepay_denied_status_id'] = $this->config->get('pchomepay_denied_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_expired_status_id'])) {
-            $data['pchomepay_expired_status_id'] = $this->request->post['pchomepay_expired_status_id'];
-        } else {
-            $data['pchomepay_expired_status_id'] = $this->config->get('pchomepay_expired_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_failed_status_id'])) {
-            $data['pchomepay_failed_status_id'] = $this->request->post['pchomepay_failed_status_id'];
-        } else {
-            $data['pchomepay_failed_status_id'] = $this->config->get('pchomepay_failed_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_pending_status_id'])) {
-            $data['pchomepay_pending_status_id'] = $this->request->post['pchomepay_pending_status_id'];
-        } else {
-            $data['pchomepay_pending_status_id'] = $this->config->get('pchomepay_pending_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_processed_status_id'])) {
-            $data['pchomepay_processed_status_id'] = $this->request->post['pchomepay_processed_status_id'];
-        } else {
-            $data['pchomepay_processed_status_id'] = $this->config->get('pchomepay_processed_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_refunded_status_id'])) {
-            $data['pchomepay_refunded_status_id'] = $this->request->post['pchomepay_refunded_status_id'];
-        } else {
-            $data['pchomepay_refunded_status_id'] = $this->config->get('pchomepay_refunded_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_reversed_status_id'])) {
-            $data['pchomepay_reversed_status_id'] = $this->request->post['pchomepay_reversed_status_id'];
-        } else {
-            $data['pchomepay_reversed_status_id'] = $this->config->get('pchomepay_reversed_status_id');
-        }
-
-        if (isset($this->request->post['pchomepay_voided_status_id'])) {
-            $data['pchomepay_voided_status_id'] = $this->request->post['pchomepay_voided_status_id'];
-        } else {
-            $data['pchomepay_voided_status_id'] = $this->config->get('pchomepay_voided_status_id');
         }
 
         $this->load->model('localisation/order_status');

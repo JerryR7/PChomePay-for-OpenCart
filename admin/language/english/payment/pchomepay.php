@@ -32,25 +32,11 @@ $_['entry_sandbox_secret'] = 'SECRET for SandBox';
 $_['entry_test'] = 'Sandbox Mode';
 $_['entry_debug'] = 'Debug Mode';
 $_['entry_geo_zone'] = 'Geo Zone';
+$_['entry_sort_order'] = 'Sort Order';
 $_['entry_payment_methods'] = 'Payment Methods';
 $_['entry_card_installment'] = 'Card Installment';
 $_['entry_atm_expiredate'] = 'ATM Expire Date';
 $_['entry_cover_transfee'] = 'Inter-bank Transfer Fee';
-
-$_['entry_canceled_reversal_status'] = 'Canceled Reversal Status';
-$_['entry_completed_status'] = 'Completed Status';
-$_['entry_denied_status'] = 'Denied Status';
-$_['entry_expired_status'] = 'Expired Status';
-$_['entry_failed_status'] = 'Failed Status';
-$_['entry_pending_status'] = 'Pending Status';
-$_['entry_processed_status'] = 'Processed Status';
-$_['entry_refunded_status'] = 'Refunded Status';
-$_['entry_reversed_status'] = 'Reversed Status';
-$_['entry_voided_status'] = 'Voided Status';
-
-// Tab
-$_['tab_general'] = 'General';
-$_['tab_order_status'] = 'Order Status';
 
 // Help
 $_['help_test'] = 'Use the live or testing (sandbox) gateway server to process transactions?';
