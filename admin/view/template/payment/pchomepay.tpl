@@ -28,10 +28,6 @@
             <div class="panel-body">
                 <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form_pchomepay"
                       class="form-horizontal">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab-general" data-toggle="tab"><?php echo $tab_general; ?></a></li>
-                        <li><a href="#tab-status" data-toggle="tab"><?php echo $tab_order_status; ?></a></li>
-                    </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-general">
                             <div class="form-group">
@@ -218,110 +214,6 @@
                                            value="<?php echo $pchomepay_sort_order; ?>"
                                            placeholder="<?php echo $entry_sort_order; ?>" id="input-sort-order"
                                            class="form-control"/>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane" id="tab-status">
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-completed-status"><?php echo $entry_completed_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_completed_status_id" id="input-completed-status"
-                                            class="form-control">
-                                        <?php foreach ($order_statuses as $order_status) { ?>
-                                        <?php if ($order_status['order_status_id'] == $pchomepay_completed_status_id) { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"
-                                                selected="selected"><?php echo $order_status['name']; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-                                        <?php } ?>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-expired-status"><?php echo $entry_expired_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_expired_status_id" id="input-expired-status"
-                                            class="form-control">
-                                        <?php foreach ($order_statuses as $order_status) { ?>
-                                        <?php if ($order_status['order_status_id'] == $pchomepay_expired_status_id) { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"
-                                                selected="selected"><?php echo $order_status['name']; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-                                        <?php } ?>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-failed-status"><?php echo $entry_failed_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_failed_status_id" id="input-failed-status"
-                                            class="form-control">
-                                        <?php foreach ($order_statuses as $order_status) { ?>
-                                        <?php if ($order_status['order_status_id'] == $pchomepay_failed_status_id) { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"
-                                                selected="selected"><?php echo $order_status['name']; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-                                        <?php } ?>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-pending-status"><?php echo $entry_pending_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_pending_status_id" id="input-pending-status"
-                                            class="form-control">
-                                        <?php foreach ($order_statuses as $order_status) { ?>
-                                        <?php if ($order_status['order_status_id'] == $pchomepay_pending_status_id) { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"
-                                                selected="selected"><?php echo $order_status['name']; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-                                        <?php } ?>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-processed-status"><?php echo $entry_processed_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_processed_status_id" id="input-processed-status"
-                                            class="form-control">
-                                        <?php foreach ($order_statuses as $order_status) { ?>
-                                        <?php if ($order_status['order_status_id'] == $pchomepay_processed_status_id) { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"
-                                                selected="selected"><?php echo $order_status['name']; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-                                        <?php } ?>
-                                        <?php } ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-refunded-status"><?php echo $entry_refunded_status; ?></label>
-                                <div class="col-sm-10">
-                                    <select name="pchomepay_refunded_status_id" id="input-refunded-status"
-                                            class="form-control">
-                                        <?php foreach ($order_statuses as $order_status) { ?>
-                                        <?php if ($order_status['order_status_id'] == $pchomepay_refunded_status_id) { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"
-                                                selected="selected"><?php echo $order_status['name']; ?></option>
-                                        <?php } else { ?>
-                                        <option value="<?php echo $order_status['order_status_id']; ?>"><?php echo $order_status['name']; ?></option>
-                                        <?php } ?>
-                                        <?php } ?>
-                                    </select>
                                 </div>
                             </div>
                         </div>

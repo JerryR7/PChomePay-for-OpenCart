@@ -242,11 +242,6 @@ class ModelPaymentPChomePay extends Model
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
 
-        if ($this->ignoreSSL) {
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        }
-
         if (!empty($settings)) {
             foreach ($settings as $key => $value) {
                 if (defined($key)) {
@@ -305,6 +300,17 @@ class ModelPaymentPChomePay extends Model
     public function formatOrderTotal($order_total)
     {
         return intval(round($order_total));
+    }
+
+    public function invokePChomePayModule() {
+        if (!class_exists('pchomepayOrderStatusEnum', false)) {
+            if (!include('pchomepayOrderStatusEnum.php')) {
+                $this->load->language('payment/pchomepay');
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function ocLog($message)

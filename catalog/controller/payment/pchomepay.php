@@ -32,6 +32,12 @@ class ControllerPaymentPChomePay extends Controller
         $this->load->model('checkout/order');
         $this->load->model('payment/pchomepay');
 
+        $invoke_result = $this->model_payment_pchomepay->invokePChomePayModule();
+
+        if (!$invoke_result) {
+            throw new Exception($this->language->get('error_module_miss'));
+        }
+
         $order_id = $this->session->data['order_id'];
 
         $postPaymentData = $this->getPChomepayPaymentData($order_id);
@@ -51,8 +57,7 @@ class ControllerPaymentPChomePay extends Controller
         }
 
         # Update order status and comments
-        $order_status_id = $this->config->get('config_order_status_id');
-        $this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
+        $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PENDING);
 
         # Clean the cart
         $this->cart->clear();
@@ -175,19 +180,28 @@ class ControllerPaymentPChomePay extends Controller
     public function callback()
     {
         $this->load->language('payment/allpay');
-        $this->load->model('payment/allpay');
+        $this->load->model('payment/pchomepay');
         $this->load->model('checkout/order');
-
 
         if (!isset($_REQUEST['notify_type']) || !isset($_REQUEST['notify_message'])) {
             http_response_code(404);
             exit;
         }
 
+        $invoke_result = $this->model_payment_pchomepay->invokePChomePayModule();
+
+        if (!$invoke_result) {
+            throw new Exception($this->language->get('error_module_miss'));
+        }
+
         $notify_type = $_REQUEST['notify_type'];
         $notify_message = $_REQUEST['notify_message'];
 
         $order_data = json_decode(str_replace('\"', '"', $notify_message));
+
+        $this->ocLog('OpenCart order id : ' . substr($order_data->order_id, 10));
+
+        $order_id = substr($order_data->order_id, 10);
 
         $this->ocLog($notify_type);
         $this->ocLog($order_data);
@@ -196,48 +210,44 @@ class ControllerPaymentPChomePay extends Controller
         # 紀錄訂單付款方式
         switch ($order_data->pay_type) {
             case 'ATM':
-                $pay_type_note = 'ATM 付款';
+                $pay_type_note = '付款方式 : ATM';
                 break;
             case 'CARD':
                 if ($order_data->payment_info->installment == 1) {
-                    $pay_type_note = '信用卡 付款 (一次付清)';
+                    $pay_type_note = '付款方式 : 信用卡 (一次付清)';
                 } else {
-                    $pay_type_note = '信用卡 分期付款 (' . $order_data->payment_info->installment . '期)';
+                    $pay_type_note = '付款方式 : 信用卡 分期付款 (' . $order_data->payment_info->installment . '期)';
                 }
                 break;
             case 'ACCT':
-                $pay_type_note = '支付連餘額 付款';
+                $pay_type_note = '付款方式 : 支付連餘額';
                 break;
             case 'EACH':
-                $pay_type_note = '銀行支付 付款';
+                $pay_type_note = '付款方式 : 銀行支付';
                 break;
             default:
                 $pay_type_note = $order_data->pay_type . '付款';
         }
 
         //  order status
-        //       1        Pending       訂單剛剛創建,等待處理.
-        //       2        Processing    當客戶付款完成,訂單狀態即為處理中.
-        //       3        Shipped       當訂單已發出,訂單狀態請設為Shipped.
-        //       5        Complete      客戶已確認收貨,訂單狀態請設為Complete.
-        //       7        Cancelled     出於某些原因,訂單取消.請將訂單狀態設為Cancelled.
-        //      10        Failed        訂單失敗
-        //      11        Refunded      如客戶退貨或退款.訂單狀態請設為Refunded.
-        //      14        Expired       訂單逾期
+        //       1        PENDING       訂單剛剛創建,等待處理.
+        //       2        PROCESSING    當客戶付款完成,訂單狀態即為處理中.
+        //       3        SHIPPED       當訂單已發出,訂單狀態請設為Shipped.
+        //       5        COMPLETE      客戶已確認收貨,訂單狀態請設為Complete.
+        //       7        CANCELLED     出於某些原因,訂單取消.請將訂單狀態設為Cancelled.
+        //      10        FAILED        訂單失敗
+        //      11        REFUNDED      如客戶退貨或退款.訂單狀態請設為Refunded.
+        //      14        EXPIRED       訂單逾期
 
         if ($notify_type == 'order_expired') {
-            $order_status_id = $this->config->get('config_order_status_id');
-            $this->model_checkout_order->addOrderHistory($order_id, $order_status_id);
             if ($order_data->status_code) {
-                $order->update_status('failed');
-                $order->add_order_note(sprintf(__('訂單已失敗。<br>error code: %1$s<br>message: %2$s', 'woocommerce'), $order_data->status_code, OrderStatusCodeEnum::getErrMsg($order_data->status_code)), true);
+                $comment = $pay_type_note . '<br>' . sprintf('訂單已失敗。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
+                $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, $comment);
             } else {
-                $order->update_status('failed');
-                $order->add_order_note( '訂單已失敗。', true);
+                $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, '訂單已失敗。');
             }
         } elseif ($notify_type == 'order_confirm') {
-            $order->add_order_note($pay_type_note, true);
-            $order->payment_complete();
+            $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PROCESSING, '訂單已成功。');
         }
 
         echo 'success';
