@@ -107,7 +107,8 @@ class pchomepayOrderStatusEnum
             static::EACH_TIMEOUT_FAILED => 'eACH 交易發生逾時',
             static::ORDER_ATM_PAYING => 'ATM 待繳款',
             static::ORDER_WAIT_SELECT_BANK => '尚未選擇銀行',
-            static::ORDER_PENDING => '訂單審單中',
+            static::ORDER_PENDING_PCHOMEPAY => '訂單於支付連審單中',
+            static::ORDER_PENDING_CLIENT => '訂單審單中',
             static::EACH_ORDER_OTP_WAIT => '銀行支付 等待OTP驗證',
         ];
 
