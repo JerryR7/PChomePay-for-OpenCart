@@ -191,29 +191,17 @@
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-2 control-label"
-                                       for="input-geo-zone"><?php echo $entry_geo_zone; ?></label>
+                                       for="input-card-last-number"><?php echo $entry_card_last_number; ?></label>
                                 <div class="col-sm-10">
-                                    <select name="pchomepay_geo_zone_id" id="input-geo-zone" class="form-control">
-                                        <option value="0"><?php echo $text_all_zones; ?></option>
-                                        <?php foreach ($geo_zones as $geo_zone) { ?>
-                                        <?php if ($geo_zone['geo_zone_id'] == $pchomepay_geo_zone_id) { ?>
-                                        <option value="<?php echo $geo_zone['geo_zone_id']; ?>"
-                                                selected="selected"><?php echo $geo_zone['name']; ?></option>
+                                    <select name="pchomepay_card_last_number" id="input-card-last-number" class="form-control">
+                                        <?php if ($pchomepay_card_last_number) { ?>
+                                        <option value="1" selected="selected"><?php echo $text_enabled; ?></option>
+                                        <option value="0"><?php echo $text_disabled; ?></option>
                                         <?php } else { ?>
-                                        <option value="<?php echo $geo_zone['geo_zone_id']; ?>"><?php echo $geo_zone['name']; ?></option>
-                                        <?php } ?>
+                                        <option value="1"><?php echo $text_enabled; ?></option>
+                                        <option value="0" selected="selected"><?php echo $text_disabled; ?></option>
                                         <?php } ?>
                                     </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"
-                                       for="input-sort-order"><?php echo $entry_sort_order; ?></label>
-                                <div class="col-sm-10">
-                                    <input type="text" name="pchomepay_sort_order"
-                                           value="<?php echo $pchomepay_sort_order; ?>"
-                                           placeholder="<?php echo $entry_sort_order; ?>" id="input-sort-order"
-                                           class="form-control"/>
                                 </div>
                             </div>
                         </div>

@@ -171,6 +171,8 @@ class ControllerPaymentPChomePay extends Controller
 
             if ($card_info) $pchomepay_args['card_info'] = $card_info;
 
+            $this->ocLog(json_encode($pchomepay_args));
+
             return json_encode($pchomepay_args);
         }
 
@@ -218,6 +220,8 @@ class ControllerPaymentPChomePay extends Controller
                 } else {
                     $pay_type_note = '付款方式 : 信用卡 分期付款 (' . $order_data->payment_info->installment . '期)';
                 }
+
+                if ($this->config->get('pchomepay_card_last_number')) $pay_type_note .= '<br>末四碼: ' . $order_data->payment_info->card_last_number;
                 break;
             case 'ACCT':
                 $pay_type_note = '付款方式 : 支付連餘額';
@@ -239,7 +243,10 @@ class ControllerPaymentPChomePay extends Controller
         //      11        REFUNDED      如客戶退貨或退款.訂單狀態請設為Refunded.
         //      14        EXPIRED       訂單逾期
 
-        if ($notify_type == 'order_expired') {
+        if ($notify_type == 'order_audit') {
+            $comment = sprintf('訂單交易等待中。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
+            $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PENDING, $comment);
+        } elseif ($notify_type == 'order_expired') {
             if ($order_data->status_code) {
                 $comment = $pay_type_note . '<br>' . sprintf('訂單已失敗。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
                 $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, $comment);
@@ -247,7 +254,7 @@ class ControllerPaymentPChomePay extends Controller
                 $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, '訂單已失敗。');
             }
         } elseif ($notify_type == 'order_confirm') {
-            $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PROCESSING, '訂單已成功。');
+            $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PROCESSING, $pay_type_note . '<br>訂單已成功。');
         }
 
         echo 'success';

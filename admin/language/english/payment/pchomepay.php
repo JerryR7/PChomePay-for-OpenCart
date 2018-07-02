@@ -37,6 +37,7 @@ $_['entry_payment_methods'] = 'Payment Methods';
 $_['entry_card_installment'] = 'Card Installment';
 $_['entry_atm_expiredate'] = 'ATM Expire Date';
 $_['entry_cover_transfee'] = 'Inter-bank Transfer Fee';
+$_['entry_card_last_number'] = 'Card last 4 numbers';
 
 // Help
 $_['help_test'] = 'Use the live or testing (sandbox) gateway server to process transactions?';

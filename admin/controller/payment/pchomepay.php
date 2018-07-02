@@ -48,11 +48,12 @@ class ControllerPaymentPChomePay extends Controller
         $data['entry_sandbox_secret'] = $this->language->get('entry_sandbox_secret');
         $data['entry_test'] = $this->language->get('entry_test');
         $data['entry_debug'] = $this->language->get('entry_debug');
-        $data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
-        $data['entry_sort_order'] = $this->language->get('entry_sort_order');
+//        $data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
+//        $data['entry_sort_order'] = $this->language->get('entry_sort_order');
         $data['entry_payment_methods'] = $this->language->get('entry_payment_methods');
         $data['entry_card_installment'] = $this->language->get('entry_card_installment');
         $data['entry_atm_expiredate'] = $this->language->get('entry_atm_expiredate');
+        $data['entry_card_last_number'] = $this->language->get('entry_card_last_number');
 
         $data['entry_completed_status'] = $this->language->get('entry_completed_status');
         $data['entry_expired_status'] = $this->language->get('entry_expired_status');
@@ -133,7 +134,8 @@ class ControllerPaymentPChomePay extends Controller
             'card_installment',
             'atm_expiredate',
             'geo_zone_id',
-            'sort_order'
+            'sort_order',
+            'card_last_number'
         );
 
         foreach ($pchomepay_settings as $setting_name) {
