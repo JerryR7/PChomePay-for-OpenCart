@@ -208,31 +208,29 @@ class ControllerPaymentPChomePay extends Controller
         $this->ocLog($notify_type);
         $this->ocLog($order_data);
 
-        $pay_type_note = '平台訂單編號: ' . $order_data->order_id . '<br>';
 
         # 紀錄訂單付款方式
         switch ($order_data->pay_type) {
             case 'ATM':
-                $pay_type_note .= '付款方式 : ATM';
-                $pay_type_note .= '<br>ATM虛擬帳號: ' . $order_data->payment_info->bank_code . ' - ' . $order_data->payment_info->virtual_account;
+                $pay_type_note = '付款方式 : ATM';
                 break;
             case 'CARD':
                 if ($order_data->payment_info->installment == 1) {
-                    $pay_type_note .= '付款方式 : 信用卡 (一次付清)';
+                    $pay_type_note = '付款方式 : 信用卡 (一次付清)';
                 } else {
-                    $pay_type_note .= '付款方式 : 信用卡 分期付款 (' . $order_data->payment_info->installment . '期)';
+                    $pay_type_note = '付款方式 : 信用卡 分期付款 (' . $order_data->payment_info->installment . '期)';
                 }
 
                 if ($this->config->get('pchomepay_card_last_number')) $pay_type_note .= '<br>末四碼: ' . $order_data->payment_info->card_last_number;
                 break;
             case 'ACCT':
-                $pay_type_note .= '付款方式 : 支付連餘額';
+                $pay_type_note = '付款方式 : 支付連餘額';
                 break;
             case 'EACH':
-                $pay_type_note .= '付款方式 : 銀行支付';
+                $pay_type_note = '付款方式 : 銀行支付';
                 break;
             default:
-                $pay_type_note .= $order_data->pay_type . '付款';
+                $pay_type_note = $order_data->pay_type . '付款';
         }
 
         //  order status
