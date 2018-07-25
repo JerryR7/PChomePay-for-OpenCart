@@ -57,7 +57,7 @@ class ControllerPaymentPChomePay extends Controller
         }
 
         # Update order status and comments
-        $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PENDING);
+        $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PENDING, '訂單編號：' . $result->order_id);
 
         # Clean the cart
         $this->cart->clear();
