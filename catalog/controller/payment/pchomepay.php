@@ -230,7 +230,7 @@ class ControllerPaymentPChomePay extends Controller
                 $pay_type_note = '付款方式 : 銀行支付';
                 break;
             default:
-                $pay_type_note = $order_data->pay_type . '付款';
+                $pay_type_note = '未選擇付款方式';
         }
 
         //  order status
@@ -244,14 +244,14 @@ class ControllerPaymentPChomePay extends Controller
         //      14        EXPIRED       訂單逾期
 
         if ($notify_type == 'order_audit') {
-            $comment = sprintf('訂單交易等待中。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
+            $comment = $pay_type_note . '<br>' . sprintf('訂單交易等待中。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
             $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PENDING, $comment);
         } elseif ($notify_type == 'order_expired') {
             if ($order_data->status_code) {
                 $comment = $pay_type_note . '<br>' . sprintf('訂單已失敗。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
                 $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, $comment);
             } else {
-                $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, '訂單已失敗。');
+                $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::FAILED, $pay_type_note . '<br>訂單已失敗。');
             }
         } elseif ($notify_type == 'order_confirm') {
             $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PROCESSING, $pay_type_note . '<br>訂單已成功。');
