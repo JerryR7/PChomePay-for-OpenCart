@@ -201,13 +201,7 @@ class ControllerPaymentPChomePay extends Controller
 
         $order_data = json_decode(str_replace('\"', '"', $notify_message));
 
-        $this->ocLog('OpenCart order id : ' . substr($order_data->order_id, 10));
-
         $order_id = substr($order_data->order_id, 10);
-
-        $this->ocLog($notify_type);
-        $this->ocLog($order_data);
-
 
         # 紀錄訂單付款方式
         switch ($order_data->pay_type) {
@@ -244,7 +238,7 @@ class ControllerPaymentPChomePay extends Controller
         //      14        EXPIRED       訂單逾期
 
         if ($notify_type == 'order_audit') {
-            $comment = $pay_type_note . '<br>' . sprintf('訂單交易等待中。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
+            $comment = sprintf('訂單交易等待中。<br>error code : %1$s<br>message : %2$s', $order_data->status_code, pchomepayOrderStatusEnum::getErrMsg($order_data->status_code));
             $this->model_checkout_order->addOrderHistory($order_id, pchomepayOrderStatusEnum::PENDING, $comment);
         } elseif ($notify_type == 'order_expired') {
             if ($order_data->status_code) {
