@@ -207,6 +207,7 @@ class ControllerPaymentPChomePay extends Controller
         switch ($order_data->pay_type) {
             case 'ATM':
                 $pay_type_note = '付款方式 : ATM';
+                $pay_type_note .= '<br>ATM虛擬帳號: ' . $order_data->payment_info->bank_code . ' - ' . $order_data->payment_info->virtual_account;
                 break;
             case 'CARD':
                 if ($order_data->payment_info->installment == 1) {
